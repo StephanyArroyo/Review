@@ -1,60 +1,97 @@
-async function sendPrompt() {
-      const nombre = document.getElementById("restaurante").value;
-      const resultDiv = document.getElementById("result");
-
-      if (!nombre.trim()) {
-        alert("Por favor escribe un nombre.");
-        return;
-      }
-
-      resultDiv.innerHTML = '<div class="loading-spinner"></div><p style="text-align:center">Analizando opiniones reales...</p>';
-
-      try {
-        const response = await fetch("/api/review", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Error desconocido en la API");
-        }
-
-        const fullText = data.reply || "";
-
-        let sentimentClass = "";
-        let emoji = "";
-        
-        // Detección flexible de sentimiento
-        const upperText = fullText.toUpperCase();
-        if (upperText.includes("POSITIVO")) {
-          sentimentClass = "positivo"; emoji = "😊";
-        } else if (upperText.includes("NEGATIVO")) {
-          sentimentClass = "negativo"; emoji = "😞";
-        } else if (upperText.includes("NEUTRAL")) {
-          sentimentClass = "neutral"; emoji = "😐";
-        }
-
-        const lines = fullText.split('\n');
-        const firstLine = lines.shift(); 
-        const restOfText = lines.join('\n');
-
-        resultDiv.innerHTML = `
-          <div class="sentiment-line ${sentimentClass}">
-            <span class="sentiment-emoji">${emoji}</span>
-            <span>${firstLine}</span>
-          </div>
-          <div class="review-body">${restOfText}</div>
-        `;
-
-      } catch (error) {
-        console.error("Error capturado:", error);
-        resultDiv.innerHTML = `
-          <div style="color:#c53030; padding:15px; background:#fff5f5; border-radius:10px; border:1px solid #feb2b2;">
-            <strong>⚠️ Error:</strong> ${error.message}<br>
-            <small>Verifica tu API Key en el archivo .env o la conexión al servidor.</small>
-          </div>`;
-      }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Reseñas IA</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 500px; }
+    
+    h1 { 
+      background: linear-gradient(135deg, #667eea, #764ba2); 
+      -webkit-background-clip: text; 
+      background-clip: text; /* Solución al aviso de compatibilidad */
+      -webkit-text-fill-color: transparent; 
+      text-align: center;
     }
+
+    textarea { width: 100%; height: 80px; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; box-sizing: border-box; }
+    button { width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+    
+    #result { margin-top: 20px; padding: 20px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; min-height: 50px; }
+    
+    /* Estilos de sentimiento */
+    .sentimiento-info { display: flex; align-items: center; gap: 10px; font-weight: bold; margin-bottom: 10px; }
+    .positivo { color: #2ecc71; }
+    .negativo { color: #e74c3c; }
+    .neutral { color: #f1c40f; }
+    
+    .emoji-animado { font-size: 1.5rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    
+    .loading { text-align: center; color: #667eea; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Reseñas con IA</h1>
+  <textarea id="restaurante" placeholder="Escribe el nombre de un lugar en Colombia..."></textarea>
+  <button onclick="sendPrompt()">Generar Reseña</button>
+  <div id="result">La reseña aparecerá aquí...</div>
+</div>
+
+<script>
+async function sendPrompt() {
+  const nombre = document.getElementById("restaurante").value;
+  const resultDiv = document.getElementById("result");
+
+  if (!nombre.trim()) {
+    alert("Por favor escribe un nombre.");
+    return;
+  }
+
+  resultDiv.innerHTML = '<div class="loading">Buscando opiniones reales...</div>';
+
+  try {
+    const response = await fetch("/api/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) throw new Error(data.message || "Error en el servidor");
+
+    const fullText = data.reply;
+    let sentimentClass = "neutral";
+    let emoji = "😐";
+
+    // Detectar sentimiento para el color y emoji
+    if (fullText.toUpperCase().includes("POSITIVO")) {
+      sentimentClass = "positivo"; emoji = "😊";
+    } else if (fullText.toUpperCase().includes("NEGATIVO")) {
+      sentimentClass = "negativo"; emoji = "😞";
+    }
+
+    // Separar la primera línea del resto
+    const lines = fullText.split('\n');
+    const firstLine = lines.shift(); 
+    const restOfText = lines.join('<br>');
+
+    resultDiv.innerHTML = `
+      <div class="sentimiento-info ${sentimentClass}">
+        <span class="emoji-animado">${emoji}</span>
+        <span>${firstLine}</span>
+      </div>
+      <div style="color: #4a5568; line-height: 1.5;">${restOfText}</div>
+    `;
+
+  } catch (error) {
+    resultDiv.innerHTML = `<div style="color:red"><b>Error:</b> ${error.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>
