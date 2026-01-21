@@ -31,7 +31,7 @@ app.post("/api/review", async (req, res) => {
     teniendo en cuenta TODAS las reseñas en la web basadas únicamente en las experiencias
     reales de todas las personas que ya han visitado el lugar, incluyendo tanto las
     negativas como las positivas. Responde SIEMPRE en español. Al inicio escribe en mayuscula el sentimiento predominante
-    (Sentimiento predominante entre los visitantes: POSITIVO, Sentimiento predominante entre los visitantes: NEGATIVO o Sentimiento predominante entre los visitantes: NEUTRAL) seguido de un salto de linea y luego la reseña.
+    (Sentimiento predominante entre los visitantes: POSITIVO, Sentimiento predominante entre los visitantes: NEGATIVO o Sentimiento predominante entre los visitantes: NEUTRAL) seguido de un salto de linea y luego la reseña.Al final muestra de cuántas reseñas se basó tu respuesta así como de las páginas de donde las obtuviste (por ejemplo: basado en 150 reseñas de Google, TripAdvisor y Yelp).
   `;
 
   try {
@@ -54,3 +54,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`>>> Servidor activo en el puerto ${PORT}`);
 });
+
