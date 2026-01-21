@@ -2,96 +2,409 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generador de Reseñas IA</title>
+  <title>Generador de Reseñas</title>
+
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-    .container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 500px; }
-    
-    h1 { 
-      background: linear-gradient(135deg, #667eea, #764ba2); 
-      -webkit-background-clip: text; 
-      background-clip: text; /* Solución al aviso de compatibilidad */
-      -webkit-text-fill-color: transparent; 
-      text-align: center;
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #e3eeff, #f7f9fc);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    textarea { width: 100%; height: 80px; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; box-sizing: border-box; }
-    button { width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+    body::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -150px;
+      right: -150px;
+      animation: float 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(20px) translateX(20px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      margin: 20px;
+      width: 90%;
+      max-width: 650px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.95); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+     color: #2d3748;
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text; 
+    }
+
+    .subtitle {
+      color: #718096;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #4a5568;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 14px;
+      border: 2px solid #e2e8f0;
+      padding: 16px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s ease;
+      background: #f7fafc;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      background: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    textarea::placeholder {
+      color: #a0aec0;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
     
-    #result { margin-top: 20px; padding: 20px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; min-height: 50px; }
-    
-    /* Estilos de sentimiento */
-    .sentimiento-info { display: flex; align-items: center; gap: 10px; font-weight: bold; margin-bottom: 10px; }
-    .positivo { color: #2ecc71; }
-    .negativo { color: #e74c3c; }
-    .neutral { color: #f1c40f; }
-    
-    .emoji-animado { font-size: 1.5rem; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-    
-    .loading { text-align: center; color: #667eea; font-style: italic; }
+    button:hover {
+      background: #3b73d1;
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #result {
+      margin-top: 30px;
+      background: linear-gradient(135deg, #f7fafc, #edf2f7);
+      padding: 24px;
+      border-radius: 14px;
+      white-space: pre-wrap;
+      border: 2px solid #e2e8f0;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #2d3748;
+      min-height: 120px;
+      animation: fadeIn 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+     @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .loading {
+      display: inline-block;
+      position: relative;
+      width: 20px;
+      height: 20px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    .loading::after {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 3px solid #667eea;
+      border-color: #667eea transparent #667eea transparent;
+      animation: spin 1.2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .result-title {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      background: #48bb78;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #38a169;
+      transform: scale(1.05);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: #a0aec0;
+      margin-top: 5px;
+    }
+
+    .error {
+      background: #fed7d7;
+      border-color: #fc8181;
+      color: #c53030;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 25px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      textarea {
+        height: 80px;
+      }
+    }
+.res-positivo { color: #2ecc71; font-weight: bold; } /* Verde */
+.res-negativo { color: #e74c3c; font-weight: bold; } /* Rojo */
+.res-neutral { color: #f1c40f; font-weight: bold; }  /* Amarillo/Dorado */
+
+.review-text {
+    display: block;
+    margin-top: 10px;
+    color: #2d3748;
+    font-weight: normal;
+}
+/* Para que el texto de la reseña sea legible debajo de la etiqueta */
+.review-body { display: block; margin-top: 15px; color: #2d3748; }
+
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>Reseñas con IA</h1>
-  <textarea id="restaurante" placeholder="Escribe el nombre de un lugar en Colombia..."></textarea>
-  <button onclick="sendPrompt()">Generar Reseña</button>
-  <div id="result">La reseña aparecerá aquí...</div>
-</div>
+  <div class="container">
+    <div class="header">
+      <div class="icon">✨</div>
+      <h1>Generador de Reseñas IA</h1>
+      <p class="subtitle">Crea reseñas auténticas en segundos</p>
+    </div>
 
-<script>
-async function sendPrompt() {
-  const nombre = document.getElementById("restaurante").value;
-  const resultDiv = document.getElementById("result");
+    <div class="input-group">
+      <label for="restaurante">Nombre del Lugar</label>
+      <textarea 
+        id="restaurante" 
+        placeholder="Ej: Restaurante La Bella Italia, Hotel Paradise, Museo Nacional..."
+        maxlength="200"
+        oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/200</div>
+    </div>
 
-  if (!nombre.trim()) {
-    alert("Por favor escribe un nombre.");
-    return;
-  }
+    <div class="button-group">
+      <button onclick="sendPrompt()" id="generateBtn">
+        <span>🎯 Generar Reseña</span>
+      </button>
+    </div>
 
-  resultDiv.innerHTML = '<div class="loading">Buscando opiniones reales...</div>';
+    <div id="result">
+      <div style="text-align: center; color: #a0aec0; padding: 20px;">
+        💭 La reseña generada aparecerá aquí...
+      </div>
+    </div>
+  </div>
 
-  try {
-    const response = await fetch("/api/review", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre })
-    });
+  <script>
+   
+   async function sendPrompt() {
+    const nombre = document.getElementById("restaurante").value;
+    const resultDiv = document.getElementById("result");
 
-    const data = await response.json();
-    
-    if (!response.ok) throw new Error(data.message || "Error en el servidor");
-
-    const fullText = data.reply;
-    let sentimentClass = "neutral";
-    let emoji = "😐";
-
-    // Detectar sentimiento para el color y emoji
-    if (fullText.toUpperCase().includes("POSITIVO")) {
-      sentimentClass = "positivo"; emoji = "😊";
-    } else if (fullText.toUpperCase().includes("NEGATIVO")) {
-      sentimentClass = "negativo"; emoji = "😞";
+    if (!nombre.trim()) {
+        resultDiv.innerText = "Por favor escribe un restaurante, hotel o lugar turistico.";
+        return;
     }
 
-    // Separar la primera línea del resto
-    const lines = fullText.split('\n');
-    const firstLine = lines.shift(); 
-    const restOfText = lines.join('<br>');
+    // Estado de carga
+    resultDiv.innerHTML = '<div style="text-align: center;"><div class="loading"></div><br>Analizando experiencias...</div>';
 
-    resultDiv.innerHTML = `
-      <div class="sentimiento-info ${sentimentClass}">
-        <span class="emoji-animado">${emoji}</span>
-        <span>${firstLine}</span>
-      </div>
-      <div style="color: #4a5568; line-height: 1.5;">${restOfText}</div>
-    `;
+    try {
+        const response = await fetch("/api/review", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre })
+        });
 
-  } catch (error) {
-    resultDiv.innerHTML = `<div style="color:red"><b>Error:</b> ${error.message}</div>`;
-  }
+        const data = await response.json();
+        let textoFinal = data.reply || "";
+
+        // Definimos las frases que esperamos del servidor
+        const frasePositivo = "Sentimiento predominante entre los visitantes: POSITIVO";
+        const fraseNegativo = "Sentimiento predominante entre los visitantes: NEGATIVO";
+        const fraseNeutral = "Sentimiento predominante entre los visitantes: NEUTRAL";
+
+        let htmlContenido = "";
+
+        if (textoFinal.includes(frasePositivo)) {
+            htmlContenido = `<span class="res-positivo">😊 ${frasePositivo}</span>`;
+            textoFinal = textoFinal.replace(frasePositivo, "");
+        } 
+        else if (textoFinal.includes(fraseNegativo)) {
+            htmlContenido = `<span class="res-negativo">😞 ${fraseNegativo}</span>`;
+            textoFinal = textoFinal.replace(fraseNegativo, "");
+        } 
+        else if (textoFinal.includes(fraseNeutral)) {
+            htmlContenido = `<span class="res-neutral">😐 ${fraseNeutral}</span>`;
+            textoFinal = textoFinal.replace(fraseNeutral, "");
+        }
+
+        // Insertamos el resultado con el color y el emoji, más el resto de la reseña
+        resultDiv.innerHTML = `
+            ${htmlContenido}
+            <div class="review-text">${textoFinal.trim()}</div>
+        `;
+
+    } catch (error) {
+        resultDiv.innerHTML = `<div class="error">Ocurrió un error: ${error}</div>`;
+    }
 }
-</script>
-</body>
-</html>
+      </script>
+
+    </body>
+    </html>
