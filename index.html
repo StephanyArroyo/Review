@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generador de Reseñas</title>
+  <title>Generador de Reseñas IA</title>
 
   <style>
     body {
@@ -18,106 +18,54 @@
       overflow-x: hidden;
     }
 
-    body::before {
+    /* Animaciones de fondo */
+    body::before, body::after {
       content: '';
       position: absolute;
-      width: 300px;
-      height: 300px;
-      background: rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      top: -100px;
-      left: -100px;
+      z-index: 0;
+    }
+    body::before {
+      width: 300px; height: 300px;
+      background: rgba(102, 126, 234, 0.1);
+      top: -100px; left: -100px;
       animation: float 6s ease-in-out infinite;
     }
-
     body::after {
-      content: '';
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-      bottom: -150px;
-      right: -150px;
+      width: 400px; height: 400px;
+      background: rgba(118, 75, 162, 0.1);
+      bottom: -150px; right: -150px;
       animation: float 8s ease-in-out infinite reverse;
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0px) translateX(0px); }
-      50% { transform: translateY(20px) translateX(20px); }
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(20px); }
     }
 
     .container {
       position: relative;
       z-index: 1;
-      margin: 20px;
       width: 90%;
       max-width: 650px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-radius: 24px;
       padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
     }
 
-    @keyframes slideIn {
-      from { 
-        opacity: 0; 
-        transform: translateY(30px) scale(0.95); 
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
-      }
-    }
+    .header { text-align: center; margin-bottom: 35px; }
+   h1 {
+  margin: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text; /* Para Chrome, Safari y Edge */
+  background-clip: text;         /* Propiedad estándar (Soluciona el aviso) */
+  -webkit-text-fill-color: transparent;
+}
 
-    .header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    h1 {
-     color: #2d3748;
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text; 
-    }
-
-    .subtitle {
-      color: #718096;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      color: #4a5568;
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .input-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 10px; color: #4a5568; }
 
     textarea {
       width: 100%;
@@ -126,246 +74,162 @@
       border: 2px solid #e2e8f0;
       padding: 16px;
       font-size: 16px;
-      resize: vertical;
+      box-sizing: border-box;
       outline: none;
-      transition: all 0.3s ease;
-      background: #f7fafc;
-      font-family: inherit;
+      transition: all 0.3s;
     }
-
-    textarea:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-      background: #ffffff;
-      transform: translateY(-2px);
-    }
-
-    textarea::placeholder {
-      color: #a0aec0;
-    }
-
-    .button-group {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 20px;
-    }
+    textarea:focus { border-color: #667eea; box-shadow: 0 0 10px rgba(102, 126, 234, 0.2); }
 
     button {
-      padding: 16px 24px;
+      width: 100%;
+      padding: 16px;
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
-      font-size: 16px;
       border-radius: 14px;
+      font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      position: relative;
-      overflow: hidden;
+      font-size: 16px;
+      transition: transform 0.2s;
     }
+    button:active { transform: scale(0.98); }
 
-    button::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    button:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-    
-    button:hover {
-      background: #3b73d1;
-    }
-
-    button:active {
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
+    /* --- ESTILOS DINÁMICOS DE RESULTADO --- */
     #result {
       margin-top: 30px;
-      background: linear-gradient(135deg, #f7fafc, #edf2f7);
       padding: 24px;
       border-radius: 14px;
-      white-space: pre-wrap;
       border: 2px solid #e2e8f0;
-      font-size: 15px;
-      line-height: 1.7;
-      color: #2d3748;
-      min-height: 120px;
-      animation: fadeIn 0.5s ease;
-      position: relative;
-      overflow: hidden;
+      background: #fcfcfc;
+      min-height: 100px;
+      line-height: 1.6;
     }
 
-     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .loading {
-      display: inline-block;
-      position: relative;
-      width: 20px;
-      height: 20px;
-      margin-left: 10px;
-      vertical-align: middle;
-    }
-
-    .loading::after {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 3px solid #667eea;
-      border-color: #667eea transparent #667eea transparent;
-      animation: spin 1.2s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .result-header {
+    .sentiment-line {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      font-weight: 800;
       margin-bottom: 15px;
+      font-size: 1.1em;
       padding-bottom: 10px;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 1px solid #eee;
     }
 
-    .result-title {
-      font-weight: 700;
-      color: #667eea;
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .sentiment-emoji {
+      font-size: 1.8em;
+      animation: bounceEmoji 1.5s infinite;
     }
 
-    .copy-btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      background: #48bb78;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
+    @keyframes bounceEmoji {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
     }
 
-    .copy-btn:hover {
-      background: #38a169;
-      transform: scale(1.05);
+    /* Colores solicitados */
+    .positivo { color: #27ae60; }
+    .negativo { color: #e74c3c; }
+    .neutral { color: #f1c40f; }
+
+    .review-body { color: #4a5568; white-space: pre-wrap; }
+
+    .char-count { text-align: right; font-size: 12px; color: #a0aec0; margin-top: 5px; }
+
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
     }
-
-    .char-count {
-      text-align: right;
-      font-size: 12px;
-      color: #a0aec0;
-      margin-top: 5px;
-    }
-
-    .error {
-      background: #fed7d7;
-      border-color: #fc8181;
-      color: #c53030;
-    }
-
-    @media (max-width: 640px) {
-      .container {
-        padding: 25px;
-      }
-
-      h1 {
-        font-size: 26px;
-      }
-
-      textarea {
-        height: 80px;
-      }
-    }
-
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-
 <body>
 
   <div class="container">
     <div class="header">
-      <div class="icon">✨</div>
+      <div style="font-size: 40px;">✨</div>
       <h1>Generador de Reseñas IA</h1>
-      <p class="subtitle">Crea reseñas auténticas en segundos</p>
+      <p style="color: #718096;">Basado en opiniones reales en Colombia</p>
     </div>
 
     <div class="input-group">
-      <label for="restaurante">Nombre del Lugar</label>
-      <textarea 
-        id="restaurante" 
-        placeholder="Ej: Restaurante La Bella Italia, Hotel Paradise, Museo Nacional..."
-        maxlength="200"
-        oninput="updateCharCount()"></textarea>
+      <label>Nombre del Lugar</label>
+      <textarea id="restaurante" placeholder="Ej: Andrés Carne de Res, Hotel Tequendama..." maxlength="200" oninput="updateCharCount()"></textarea>
       <div class="char-count"><span id="charCount">0</span>/200</div>
     </div>
 
-    <div class="button-group">
-      <button onclick="sendPrompt()" id="generateBtn">
-        <span>🎯 Generar Reseña</span>
-      </button>
-    </div>
+    <button onclick="sendPrompt()" id="generateBtn">🎯 Generar Reseña</button>
 
     <div id="result">
       <div style="text-align: center; color: #a0aec0; padding: 20px;">
-        💭 La reseña generada aparecerá aquí...
+        💭 La reseña aparecerá aquí...
       </div>
     </div>
   </div>
 
   <script>
+    function updateCharCount() {
+      const text = document.getElementById("restaurante").value;
+      document.getElementById("charCount").innerText = text.length;
+    }
+
     async function sendPrompt() {
-          const nombre = document.getElementById("restaurante").value;
+      const nombre = document.getElementById("restaurante").value;
+      const resultDiv = document.getElementById("result");
 
-          if (!nombre.trim()) {
-            document.getElementById("result").innerText = "Por favor escribe un restaurante, hotel o lugar turistico.";
-            return;
-          }
+      if (!nombre.trim()) {
+        alert("Por favor escribe un nombre.");
+        return;
+      }
 
-          document.getElementById("result").innerText = "Generando reseña...";
+      resultDiv.innerHTML = '<div class="loading-spinner"></div><p style="text-align:center">Analizando reseñas...</p>';
 
-          try {
-            const response = await fetch("/api/review", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ nombre })   // ← CORREGIDO
-            });
+      try {
+        const response = await fetch("/api/review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre })
+        });
 
-            const data = await response.json();
+        const data = await response.json();
+        const fullText = data.reply || "";
 
-            document.getElementById("result").innerText = data.reply || "No se recibió respuesta.";
-
-          } catch (error) {
-            document.getElementById("result").innerText =
-              "Ocurrió un error: " + error;
-          }
+        // Lógica de detección de sentimiento
+        let sentimentClass = "";
+        let emoji = "";
+        
+        if (fullText.includes("POSITIVO")) {
+          sentimentClass = "positivo";
+          emoji = "😊";
+        } else if (fullText.includes("NEGATIVO")) {
+          sentimentClass = "negativo";
+          emoji = "😞";
+        } else if (fullText.includes("NEUTRAL")) {
+          sentimentClass = "neutral";
+          emoji = "😐";
         }
-      </script>
 
-    </body>
-    </html>
+        // Separar la primera línea del resto
+        const lines = fullText.split('\n');
+        const firstLine = lines.shift(); // Título del sentimiento
+        const restOfText = lines.join('\n'); // Cuerpo de la reseña
+
+        resultDiv.innerHTML = `
+          <div class="sentiment-line ${sentimentClass}">
+            <span class="sentiment-emoji">${emoji}</span>
+            <span>${firstLine}</span>
+          </div>
+          <div class="review-body">${restOfText}</div>
+        `;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div style="color:red">Error: ${error.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
