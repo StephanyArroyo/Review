@@ -8,15 +8,17 @@ require("dotenv").config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Servir archivos estáticos desde la carpeta actual
 app.use(express.static(__dirname));
+
+// Verificación de API KEY en consola al iniciar
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.error("ERROR: No se encontró la ANTHROPIC_API_KEY en el archivo .env");
+}
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
-// Ruta para la API
 app.post("/api/review", async (req, res) => {
   const { nombre } = req.body;
 
@@ -30,16 +32,24 @@ app.post("/api/review", async (req, res) => {
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20240620", // Asegúrate de usar un modelo válido
-      max_tokens: 3000,
+      // Cambiado a un modelo de amplia disponibilidad
+      model: "claude-3-sonnet-20240229", 
+      max_tokens: 1000,
       messages: [{ role: "user", content: prompt }]
     });
 
-    res.json({ reply: response.content[0].text });
+    if (response && response.content && response.content[0]) {
+      res.json({ reply: response.content[0].text });
+    } else {
+      throw new Error("Respuesta de IA vacía");
+    }
 
   } catch (error) {
-    console.error("SERVER ERROR:", error);
-    res.status(500).json({ error: "Error llamando a la API", details: error.message });
+    console.error("DETALLE DEL ERROR EN SERVIDOR:", error);
+    res.status(500).json({ 
+      error: "Error en el servidor", 
+      message: error.message 
+    });
   }
 });
 
